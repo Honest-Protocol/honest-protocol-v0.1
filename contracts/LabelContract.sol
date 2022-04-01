@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 //assumes that any string argument in a function is already properly formatted (ex. labelName)
 
+
 contract LabelContract {
     // Each asset item will map to one of these
     struct LabelData {
@@ -13,8 +14,8 @@ contract LabelContract {
     mapping(string => uint256) public labelIndices;     // pairing of label name -> index storage of each label
 
     mapping(address => LabelData) private labelInfo;   // pairing of NFT address -> Label struct
-    string[] private labelIndicesKeys;                 // array storage of label - order corresponding to position of the label 
-    address owner;
+    string[] private allLabels;                 // array storage of label - order corresponding to position of the label 
+    address private owner;
     mapping(address => bool) public whiteListedAuditors;
 
     event NewLabelAdded(string labelName, uint256 labelIndex); 
@@ -24,13 +25,17 @@ contract LabelContract {
         owner = msg.sender;
     }
 
+    function getAllLabels() external view returns (string[] memory) {
+        return allLabels;
+    }
+
     function addWhitelistAuditor(address newAuditor) public {
         require(owner == msg.sender, "ONLY CONTRACT OWNER CAN ADD NEW AUDITORS");
         whiteListedAuditors[newAuditor] = true;
     }
 
     function getLabelOfAsset(address asset, uint256 labelIndex) public view returns (bool) {
-        require(labelIndex < labelIndicesKeys.length, "Label index does not exist.");
+        require(labelIndex < allLabels.length, "Label index does not exist.");
         uint256 labelData = getLabelData(asset);
         return ((labelData >> labelIndex) & 1) != 0; //gets nth bit, where n is labelIndex
     }
@@ -54,8 +59,8 @@ contract LabelContract {
     function labelExists(string calldata _label) public view returns (bool) {
         //label is not the first one (but exists), or label is the first one
         return labelIndices[_label] > 0 || (
-                labelIndicesKeys.length > 0 && 
-                keccak256(abi.encode(labelIndicesKeys[0])) != keccak256(abi.encode(_label))
+                allLabels.length > 0 && 
+                keccak256(abi.encode(allLabels[0])) != keccak256(abi.encode(_label))
         );
     }
 
@@ -64,9 +69,9 @@ contract LabelContract {
         require(labelExists(_newLabel), "Label already exists.");  // requires that the label doesn't exist 
         require(whiteListedAuditors[msg.sender], "Auditor/contributor not whitelisted.");
         // Append
-        uint256 newIndex = labelIndicesKeys.length;
+        uint256 newIndex = allLabels.length;
         labelIndices[_newLabel] = newIndex;
-        labelIndicesKeys.push(_newLabel);
+        allLabels.push(_newLabel);
         emit NewLabelAdded(_newLabel, newIndex);
     }
 

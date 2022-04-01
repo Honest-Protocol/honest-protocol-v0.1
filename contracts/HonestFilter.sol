@@ -26,18 +26,18 @@ contract HonestFilter {
 
     //returns a uint256 representing the required values that have yet to be audited 
     function getUnknowns(address assetAddress) external view returns (uint256) {
-        uint256 labelData = LabelContract(labelContract).getLabelData(assetAddress);
+        string[] memory allLabels = LabelContract(labelContract).getAllLabels();
         string[] memory proofs = LabelContract(labelContract).getProofs(assetAddress);
         uint256 _labelsRequired = labelsRequired;
         uint256 unknowns = 0;
         uint256 mask = 1;
         uint256 i = 0;
-        while (_labelsRequired > 0) {
+        while (i < allLabels.length) {
             bool currRequired = _labelsRequired & 1 != 0;
             if (currRequired && 
                 //proof doesn't exist 
                 (i >= proofs.length || 
-                    (keccak256(abi.encode(proofs[0])) == keccak256(abi.encode("")))
+                    (keccak256(abi.encode(proofs[i])) == keccak256(abi.encode("")))
                 )
             ) {
                     unknowns &= mask;
@@ -45,8 +45,8 @@ contract HonestFilter {
 
             //prepare for next bit
             _labelsRequired >>= 1;
-            labelData >>= 1;
             mask <<= 1;
+            i++;
         }
         return unknowns;
     }
