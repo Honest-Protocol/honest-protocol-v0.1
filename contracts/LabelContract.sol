@@ -66,7 +66,7 @@ contract LabelContract {
 
     //creates original Label 
     function addLabel(string calldata _newLabel) public {
-        require(labelExists(_newLabel), "Label already exists.");  // requires that the label doesn't exist 
+        require(!labelExists(_newLabel), "Label already exists.");  // requires that the label doesn't exist 
         require(whiteListedAuditors[msg.sender], "Auditor/contributor not whitelisted.");
         // Append
         uint256 newIndex = allLabels.length;
