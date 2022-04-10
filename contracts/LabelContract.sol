@@ -60,7 +60,7 @@ contract LabelContract {
         //label is not the first one (but exists), or label is the first one
         return labelIndices[_label] > 0 || (
                 allLabels.length > 0 && 
-                keccak256(abi.encode(allLabels[0])) != keccak256(abi.encode(_label))
+                keccak256(abi.encode(allLabels[0])) == keccak256(abi.encode(_label))
         );
     }
 
@@ -76,11 +76,11 @@ contract LabelContract {
     }
 
     function changeLabelValue(address asset, string calldata _label, bool _labelValue, string calldata _labelProof) private {
-        uint256 index = labelIndices[_label];
         
         if (!labelExists(_label)) {
             addLabel(_label);
         }
+        uint256 index = labelIndices[_label];
 
         //add/edit labelValue
         if (_labelValue) { 
