@@ -35,7 +35,7 @@ contract HonestFilter {
     //  Called by the factory at time of deployment
     function initialize(uint256 _labelsRequired, uint256 _valuesRequired, address _labelContract) external {
         require(msg.sender == factory, "FORBIDDEN");
-        uint allLabels = LabelContract(labelContract).getAllLabels().length;
+        uint allLabels = LabelContract(_labelContract).getAllLabels().length;
         require(isValidRequirement(_labelsRequired, allLabels), "labelsRequired must use existing labels");
         require(isValidRequirement(_valuesRequired, allLabels), "valuesRequired must use existing labels");
         require(valueReqsFitLabelReqs(_labelsRequired, _valuesRequired), "can only require a TRUE for a required label");
