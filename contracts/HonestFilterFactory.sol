@@ -4,33 +4,59 @@ import "hardhat/console.sol";
 import "./HonestFilter.sol";
 
 contract FilterFactory {
-    mapping(uint256 => mapping(uint256 => address)) public getFilterAddress;   //pairing of filtermap -> filtercontract address 
+    mapping(uint256 => mapping(uint256 => address)) public getFilterAddress; //pairing of filtermap -> filtercontract address
     address public labelContract;
     address[] private allFilters;
 
-    event FilterCreated(uint256 labelsRequired, uint256 valuesRequired, address newFilter, uint); 
+    event FilterCreated(
+        uint256 labelsRequired,
+        uint256 valuesRequired,
+        address newFilter,
+        uint256
+    );
 
     constructor() {
         console.log("Deploying factory filter");
-        labelContract = address(0); // TODO: add actual conract later 
+        labelContract = address(0); // TODO: add actual conract later
     }
 
-    function createFilter(uint256 labelsRequired, uint256 valuesRequired) external returns (address newFilter) {
-        require(getFilterAddress[labelsRequired][valuesRequired] == address(0), "FILTER ALREADY EXISTS.");
+    function createFilter(uint256 labelsRequired, uint256 valuesRequired)
+        external
+        returns (address newFilter)
+    {
+        require(
+            getFilterAddress[labelsRequired][valuesRequired] == address(0),
+            "FILTER ALREADY EXISTS."
+        );
         console.log("Creating Filter");
         bytes memory bytecode = type(HonestFilter).creationCode;
-        bytes32 salt = keccak256(abi.encodePacked(labelsRequired, valuesRequired));
+        bytes32 salt = keccak256(
+            abi.encodePacked(labelsRequired, valuesRequired)
+        );
         assembly {
             //new address of filter
             newFilter := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
-        HonestFilter(newFilter).initialize(labelsRequired, valuesRequired, labelContract);
+        HonestFilter(newFilter).initialize(
+            labelsRequired,
+            valuesRequired,
+            labelContract
+        );
         getFilterAddress[labelsRequired][valuesRequired] = newFilter;
         allFilters.push(newFilter);
-        emit FilterCreated(labelsRequired, valuesRequired, newFilter, allFilters.length);
+        emit FilterCreated(
+            labelsRequired,
+            valuesRequired,
+            newFilter,
+            allFilters.length
+        );
     }
 
-    function getMissedCriteria(address asset, uint256 labelsRequired, uint256 valuesRequired) external view returns (uint256 passes) {
+    function getMissedCriteria(
+        address asset,
+        uint256 labelsRequired,
+        uint256 valuesRequired
+    ) external view returns (uint256 misses) {
         address filter = getFilterAddress[labelsRequired][valuesRequired];
         require(filter != address(0), "FILTER DOES NOT EXIST.");
         misses = HonestFilter(filter).getMissedCriteria(asset);
