@@ -33,6 +33,6 @@ contract FilterFactory {
     function getMissedCriteria(address asset, uint256 labelsRequired, uint256 valuesRequired) external view returns (uint256 passes) {
         address filter = getFilterAddress[labelsRequired][valuesRequired];
         require(filter != address(0), "FILTER DOES NOT EXIST.");
-        passes = HonestFilter(filter).getMissedCriteria(asset);
+        misses = HonestFilter(filter).getMissedCriteria(asset);
     }
 }
