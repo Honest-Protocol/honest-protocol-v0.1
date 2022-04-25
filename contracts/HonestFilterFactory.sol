@@ -20,28 +20,18 @@ contract FilterFactory {
         labelContract = address(0); // TODO: add actual conract later
     }
 
-    function createFilter(uint256 labelsRequired, uint256 valuesRequired)
-        external
-        returns (address newFilter)
-    {
+    function createFilter(
+        uint256 labelsRequired,
+        uint256 valuesRequired,
+        string calldata name
+    ) external returns (address newFilter) {
         require(
             getFilterAddress[labelsRequired][valuesRequired] == address(0),
             "FILTER ALREADY EXISTS."
         );
-        console.log("Creating Filter");
-        bytes memory bytecode = type(HonestFilter).creationCode;
-        bytes32 salt = keccak256(
-            abi.encodePacked(labelsRequired, valuesRequired)
-        );
-        assembly {
-            //new address of filter
-            newFilter := create2(0, add(bytecode, 32), mload(bytecode), salt)
-        }
-        HonestFilter(newFilter).initialize(
-            labelsRequired,
-            valuesRequired,
-            labelContract
-        );
+        HonestFilter f = new HonestFilter();
+
+        f.initialize(labelsRequired, valuesRequired, name, labelContract);
         getFilterAddress[labelsRequired][valuesRequired] = newFilter;
         allFilters.push(newFilter);
         emit FilterCreated(
