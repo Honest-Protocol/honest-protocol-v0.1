@@ -6,7 +6,7 @@ import "./HonestFilter.sol";
 contract FilterFactory {
     mapping(uint256 => mapping(uint256 => address)) public getFilterAddress; //pairing of filtermap -> filtercontract address
     address public labelContract;
-    address[] private allFilters;
+    address[] public allFilters;
 
     event FilterCreated(
         uint256 labelsRequired,
