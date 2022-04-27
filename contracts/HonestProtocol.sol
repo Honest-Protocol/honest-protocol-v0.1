@@ -18,8 +18,12 @@ contract LabelContract {
 
     event NewLabelAdded(string labelName, uint256 labelIndex);
 
+    event FilterFactoryCreated(address filterFactoryAddress);
+
     constructor() {
         owner = msg.sender;
+        FilterFactory ff = new FilterFactory(address(this));
+        emit FilterFactoryCreated(address(ff));
     }
 
     function getAllLabels() external view returns (string[] memory) {
@@ -193,11 +197,6 @@ contract LabelContract {
         string memory proof = labelInfo[asset].proofs[labelIndex];
         require(bytes(proof).length > 0, "Proof does not exist.");
         return proof;
-    }
-
-    function createFilterFactory() private {
-        // Require security check here to filter non-authorized addresses
-        new FilterFactory(address(this));
     }
 }
 
