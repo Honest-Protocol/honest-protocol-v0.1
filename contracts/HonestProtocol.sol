@@ -201,7 +201,6 @@ contract LabelContract {
     }
 }
 
-
 contract FilterFactory {
     mapping(uint256 => mapping(uint256 => address)) public getFilterAddress; //pairing of filtermap -> filtercontract address
     address public labelContract;
@@ -222,20 +221,25 @@ contract FilterFactory {
         uint256 labelsRequired,
         uint256 valuesRequired,
         string calldata name
-    ) external returns (address newFilter) {
+    ) external returns (address newFilterAddress) {
         require(
             getFilterAddress[labelsRequired][valuesRequired] == address(0),
             "FILTER ALREADY EXISTS."
         );
-        HonestFilter f = new HonestFilter();
-
-        f.initialize(labelsRequired, valuesRequired, name, labelContract);
-        getFilterAddress[labelsRequired][valuesRequired] = newFilter;
-        allFilters.push(newFilter);
+        HonestFilter newFilter = new HonestFilter();
+        newFilter.initialize(
+            labelsRequired,
+            valuesRequired,
+            name,
+            labelContract
+        );
+        newFilterAddress = address(newFilter);
+        getFilterAddress[labelsRequired][valuesRequired] = newFilterAddress;
+        allFilters.push(newFilterAddress);
         emit FilterCreated(
             labelsRequired,
             valuesRequired,
-            newFilter,
+            newFilterAddress,
             allFilters.length
         );
     }
@@ -250,7 +254,6 @@ contract FilterFactory {
         misses = HonestFilter(filter).getMissedCriteria(asset);
     }
 }
-
 
 contract HonestFilter {
     address public factory;
