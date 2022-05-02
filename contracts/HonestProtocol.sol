@@ -97,6 +97,7 @@ contract LabelContract {
         bool _labelValue,
         string calldata _labelProof
     ) private {
+        require(bytes(_labelProof).length > 0, "Proof cannot be empty.");
         if (!labelExists(_label)) {
             addLabel(_label);
         }
