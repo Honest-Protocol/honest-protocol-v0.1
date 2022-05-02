@@ -6,24 +6,23 @@
 const hre = require("hardhat");
 
 const main = async () => {
-  // gets info of the account used to deploy
+  // Gets info of the account used to deploy
   const [deployer] = await hre.ethers.getSigners();
   const accountBalance = await deployer.getBalance();
 
   console.log('Deploying contract with account: ', deployer.address);
   console.log('Account balance: ', accountBalance.toString());
 
-  // read contract file
-  const LabelContract = await hre.ethers.getContractFactory(
-    'LabelContract.sol'
-  );
-  // triggers deployment
-  const label = await LabelContract.deploy({});
+  // Read contract file
+  const LabelContract = await hre.ethers.getContractFactory('LabelContract');
 
-  // wait for deployment to finish
+  // Triggers deployment
+  const label_contract = await LabelContract.deploy();
+
+  // Wait for deployment to finish
   await label.deployed();
 
-  console.log('lablecontract contract address: ', label.address);
+  console.log('Contract deployed to address: ', label_contract.address);
 };
 
 const runMain = async () => {
