@@ -216,6 +216,10 @@ contract FilterFactory {
         labelContract = address(labelContractAddress);
     }
 
+    function getAllFilters() external view returns (address[] memory filters) {
+        filters = allFilters;
+    }
+
     function createFilter(
         uint256 labelsRequired,
         uint256 valuesRequired,
