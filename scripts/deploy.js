@@ -20,7 +20,7 @@ const main = async () => {
   const label_contract = await LabelContract.deploy();
 
   // Wait for deployment to finish
-  await label.deployed();
+  await label_contract.deployed();
 
   console.log('Contract deployed to address: ', label_contract.address);
 };
