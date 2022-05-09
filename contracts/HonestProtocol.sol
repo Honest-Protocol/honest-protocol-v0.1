@@ -26,6 +26,20 @@ contract LabelContract {
         emit FilterFactoryCreated(address(ff));
     }
 
+    function auditedLabels(address asset)
+        external
+        view
+        returns (uint256 audited)
+    {
+        audited = 0;
+        for (uint256 i = 0; i < labelInfo[asset].proofs.length; i++) {
+            if (bytes(labelInfo[asset].proofs[i]).length > 0) {
+                //this label is audited.
+                audited |= (1 << i);
+            }
+        }
+    }
+
     function getAllLabels() external view returns (string[] memory) {
         return allLabels;
     }
@@ -325,36 +339,6 @@ contract HonestFilter {
         valuesRequired = _valuesRequired;
         labelContract = _labelContract;
         name = _name;
-    }
-
-    //returns a uint256 representing the required values that have yet to be audited
-    function getUnknowns(address assetAddress) external view returns (uint256) {
-        string[] memory allLabels = LabelContract(labelContract).getAllLabels();
-        string[] memory proofs = LabelContract(labelContract).getProofs(
-            assetAddress
-        );
-        uint256 _labelsRequired = labelsRequired;
-        uint256 unknowns = 0;
-        uint256 mask = 1;
-        uint256 i = 0;
-        while (i < allLabels.length) {
-            bool currRequired = (_labelsRequired & 1) != 0;
-            if (
-                currRequired &&
-                //proof doesn't exist
-                (i >= proofs.length ||
-                    (keccak256(abi.encode(proofs[i])) ==
-                        keccak256(abi.encode(""))))
-            ) {
-                unknowns |= mask;
-            }
-
-            //prepare for next bit
-            _labelsRequired >>= 1;
-            mask <<= 1;
-            i++;
-        }
-        return unknowns;
     }
 
     //if it passes the filter, this will return 0.
