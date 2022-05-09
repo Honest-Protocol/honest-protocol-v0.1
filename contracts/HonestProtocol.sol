@@ -20,6 +20,8 @@ contract LabelContract {
 
     event FilterFactoryCreated(address filterFactoryAddress);
 
+    event NewAuditedAsset(address asset);
+
     constructor() {
         owner = msg.sender;
         FilterFactory ff = new FilterFactory(address(this));
@@ -124,6 +126,10 @@ contract LabelContract {
         } else {
             //change to 0
             labelInfo[asset].labelValues &= ~(1 << index); //& with a uint256 of all 1s except at the index.
+        }
+
+        if (labelInfo[asset].proofs.length == 0) {
+            emit NewAuditedAsset(asset);
         }
 
         //make sure proofs array can accommodate if it's a new label
