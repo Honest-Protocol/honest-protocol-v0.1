@@ -1,34 +1,10 @@
-# Where to get started 
-
-Please reference the Wiki first for details on our progress.
-
-# HonestNFT Protocol: Deploying contracts:
-
-First, you have to make sure that you have a `.env` file in the root directory that looks somewhat like this:
-
-```shell
-API_URL = "https://eth-rinkeby.alchemyapi.io/v2/yourAPIKeyThatYouObtainFromAlchemy"
-PRIVATE_KEY = "YourWalletPrivateKey"
-```
-
-Then, you may deploy the contracts by running:
-
-```shell
-npx hardhat run --network rinkeby scripts/deploy.js
-```
-
-# Etherscan verification
-
-To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
-
-In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
-
-```shell
-hardhat run --network ropsten scripts/deploy.js
-```
-
-Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
-
-```shell
-npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
-```
+# Overview
+## Label Contract
+Label contract is, in essence, the on-chain database of labels for audited NFT collections. It is designed to hold all the NFT collections, the label values of each NFT collection, and the proof of those labels for the NFT collection. For example, it would hold the address of the Vigilante NFT collection, 1 for “Commit-Reveal” Label, and a pointer (ex. an IPFS link) to the proof of commit-reveal for the Vigilante NFT collection.
+## Filter Factory Contract
+Filter Factory contract is designed to create and hold “filters” or selections of labels that a user will deem relevant for their use case. APIs, users, or other contracts can interact directly with this contract to determine if a NFT collection meets their filter criteria.
+## Filter Contract
+Filter Contract is where APIs, users, or contracts interact directly with this contract to determine if a NFT collection meets this particular filter’s criteria.
+## Overall notes
+- Throughout these contracts, you will see the label values and filters in the form of a uint256. This is because we are treating the uint256 as simply an array of booleans, where the 0th place bool pertains to label 0 (let’s say, level of gas fees), the first place bool pertains to label 1 (let’s say, uniformity of rarity map distribution), etc. The label ↔ index assignment follows the order in which label types are added to the label contract.
+- v1 does not include the consensus mechanisms (where auditors and agree/disagree, and validators confirm the audit). That will be added later. Ergo, in order to audit an NFT collection through these contracts, you must be a whitelisted auditor (see Label Contract).
